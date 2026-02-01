@@ -9,7 +9,7 @@ export type AppointmentRecord = {
   client_name: string;
   type: AppointmentType;
   status: AppointmentStatus;
-  start_time: string;
+  start_time: number;
   duration_minutes: number;
   treatment_notes: string | null;
   apple_event_id: string | null;
@@ -46,13 +46,14 @@ export const initDB = async () => {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );`
   );
+  await executeSql('DROP TABLE IF EXISTS Appointments;');
   await executeSql(
     `CREATE TABLE IF NOT EXISTS Appointments (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       client_id INTEGER NOT NULL,
       type TEXT NOT NULL CHECK(type IN ('manicure','pedicure','both')),
       status TEXT NOT NULL CHECK(status IN ('scheduled','done','canceled')) DEFAULT 'scheduled',
-      start_time DATETIME NOT NULL,
+      start_time INTEGER NOT NULL,
       duration_minutes INTEGER NOT NULL DEFAULT 60,
       treatment_notes TEXT,
       apple_event_id TEXT,
@@ -103,13 +104,15 @@ export const listTodayAppointments = async (): Promise<AppointmentRecord[]> => {
   start.setHours(0, 0, 0, 0);
   const end = new Date();
   end.setHours(23, 59, 59, 999);
+  const startMs = start.getTime();
+  const endMs = end.getTime();
   const result = await executeSql(
     `SELECT Appointments.*, Clients.name as client_name
      FROM Appointments
      JOIN Clients ON Clients.id = Appointments.client_id
      WHERE start_time >= ? AND start_time <= ?
      ORDER BY start_time ASC`,
-    [start.toISOString(), end.toISOString()]
+    [startMs, endMs]
   );
   return result.rows._array as AppointmentRecord[];
 };
@@ -131,16 +134,15 @@ export const createClient = async (name: string, phone?: string | null) => {
   return result.insertId as number;
 };
 
-export const checkConflict = async (startTime: string, durationMinutes: number) => {
-  const start = new Date(startTime);
-  const end = new Date(start.getTime() + durationMinutes * 60000);
+export const checkConflict = async (startTimeMs: number, durationMinutes: number) => {
+  const endMs = startTimeMs + durationMinutes * 60000;
   const result = await executeSql(
     `SELECT id FROM Appointments
      WHERE status IN ('scheduled','done')
      AND start_time < ?
-     AND datetime(start_time, '+' || duration_minutes || ' minutes') > ?
+     AND (start_time + duration_minutes * 60000) > ?
      LIMIT 1`,
-    [end.toISOString(), start.toISOString()]
+    [endMs, startTimeMs]
   );
   return result.rows.length > 0;
 };
@@ -148,7 +150,7 @@ export const checkConflict = async (startTime: string, durationMinutes: number) 
 export const createAppointment = async (params: {
   clientId: number;
   type: AppointmentType;
-  startTime: string;
+  startTime: number;
   durationMinutes: number;
   treatmentNotes?: string | null;
   appleEventId?: string | null;

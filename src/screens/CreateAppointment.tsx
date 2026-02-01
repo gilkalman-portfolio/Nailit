@@ -68,7 +68,7 @@ export const CreateAppointment: React.FC<Props> = ({ onDone }) => {
       Alert.alert('משך לא תקין', 'תכניסי משך זמן תקין בדקות.');
       return;
     }
-    const conflict = await checkConflict(startDate.toISOString(), parsedDuration);
+    const conflict = await checkConflict(startDate.getTime(), parsedDuration);
     if (conflict) {
       Alert.alert('חפיפה', 'יש חפיפה עם תור אחר. תבחרי שעה אחרת.');
       return;
@@ -83,7 +83,7 @@ export const CreateAppointment: React.FC<Props> = ({ onDone }) => {
     const appointmentId = await createAppointment({
       clientId,
       type,
-      startTime: startDate.toISOString(),
+      startTime: startDate.getTime(),
       durationMinutes: parsedDuration,
       treatmentNotes: notes.trim() || null,
       appleEventId: null,

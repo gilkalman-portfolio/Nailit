@@ -18,10 +18,8 @@ const typeLabels: Record<AppointmentRecord['type'], string> = {
 const formatTime = (date: Date) =>
   date.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
 
-const getEndTime = (start: string, durationMinutes: number) => {
-  const date = new Date(start);
-  return new Date(date.getTime() + durationMinutes * 60000);
-};
+const getEndTime = (startMs: number, durationMinutes: number) =>
+  new Date(startMs + durationMinutes * 60000);
 
 type Props = {
   appointments: AppointmentRecord[];
