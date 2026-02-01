@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "NailIt",
+    "slug": "nailit",
+    "version": "1.0.0",
+    "sdkVersion": "50.0.0",
+    "platforms": ["ios"],
+    "orientation": "portrait",
+    "splash": {
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCalendarsUsageDescription": "נדרש חיבור ליומן כדי ליצור תורים.",
+        "NSUserNotificationUsageDescription": "נדרש אישור כדי לשלוח התראות מקומיות."
+      }
+    }
+  }
+}
