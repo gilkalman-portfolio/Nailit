@@ -13,7 +13,8 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSCalendarsUsageDescription": "נדרש חיבור ליומן כדי ליצור תורים."
+        "NSCalendarsUsageDescription": "נדרש חיבור ליומן כדי ליצור תורים.",
+        "NSUserNotificationUsageDescription": "נדרש אישור כדי לשלוח התראות מקומיות."
       }
     }
   }
